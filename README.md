@@ -1,4 +1,4 @@
-# EasyRestfulClient
+# RestfulClient 
 It is java library developed on top of Apache HTTP library and JDK executor framework. It has capability to execute multiple restful requests concurrently in very easy way. 
 
 ## Features
@@ -32,7 +32,7 @@ import org.gj.java.utility.restfulservices.restfulclient.main.RestClientManager;
 
 ```
 
-Initial Object of RestClientManager with number of working concurrent working thread as shown below
+Initialize Object of RestClientManager with number of working concurrent threads. Below code will initialize restfulclient with three concurrent working threads which can accepts requests for executions.
 
 
 ```java
@@ -44,7 +44,7 @@ Initial Object of RestClientManager with number of working concurrent working th
 ### Create Request 
 
 Depending upon Content_type header value, library converts request java object to either json or xml.
-Likewise upon Accept header value, library build response either from json or xml response.
+Likewise upon Accept header value, library build response object either from json or xml response.
 
 #### GET  
 
