@@ -32,6 +32,7 @@ public class HttpGetClient extends HttpClient{
         Parser parser=getParser(request.getHeaders().get(Constant.ACCEPT));    
         response.setHeaders(getResponseHeader(httpResponse));
         response.setBody(parser.deserialize(getResponseBody(httpResponse), request.getResponseClass()));
+        httpClient.close();
 		return response;
 	}
 

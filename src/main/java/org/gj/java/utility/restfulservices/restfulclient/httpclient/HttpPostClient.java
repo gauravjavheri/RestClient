@@ -36,6 +36,7 @@ public class HttpPostClient extends HttpClient{
         Parser responseParser=getParser(request.getHeaders().get(Constant.ACCEPT));        
         response.setHeaders(getResponseHeader(httpResponse));
         response.setBody(responseParser.deserialize(getResponseBody(httpResponse), request.getResponseClass()));
+        httpClient.close();
 		return response;
 
 	}
