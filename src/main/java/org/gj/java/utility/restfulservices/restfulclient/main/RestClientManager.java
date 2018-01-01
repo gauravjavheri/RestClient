@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.gj.java.utility.restfulservices.restfulclient.model.Request;
+import org.gj.java.utility.restfulservices.restfulclient.model.Response;
 import org.gj.java.utility.restfulservices.restfulclient.tasks.RequestTask;
 
 public class RestClientManager {
@@ -31,13 +32,13 @@ public class RestClientManager {
 		this.numberOfThreads = numberOfThreads;
 	}
 
-	public Object getData(Request request) throws InterruptedException, ExecutionException{
-		Future<Object> threadOutput=executorService.submit(getRequestTask(request));
+	public Response getData(Request request) throws InterruptedException, ExecutionException{
+		Future<Response> threadOutput=executorService.submit(getRequestTask(request));
 	    return threadOutput.get();			
 	}
 	
-	public List<Object> getData(List<Request> requests) throws InterruptedException, ExecutionException{
-		List<Future<Object>> threadOutputs=executorService.invokeAll(getRequestTask(requests));
+	public List<Response> getData(List<Request> requests) throws InterruptedException, ExecutionException{
+		List<Future<Response>> threadOutputs=executorService.invokeAll(getRequestTask(requests));
 	/*	for(RequestTask requestTask:getRequestTask(requests)){
 			Future<Object> result=executorService.submit(requestTask);
 			threadOutputs.add(result);
@@ -50,9 +51,9 @@ public class RestClientManager {
 	   executorService.shutdown();
    }
    
-   private List<Object> extractResponse(List<Future<Object>> threadOutputs) throws InterruptedException, ExecutionException{
-	   List<Object> finalResponseList=new ArrayList<Object>();
-	   for(Future<Object> threadOutput:threadOutputs){
+   private List<Response> extractResponse(List<Future<Response>> threadOutputs) throws InterruptedException, ExecutionException{
+	   List<Response> finalResponseList=new ArrayList<Response>();
+	   for(Future<Response> threadOutput:threadOutputs){
 		   finalResponseList.add(threadOutput.get());
 	   }
 	   return finalResponseList;

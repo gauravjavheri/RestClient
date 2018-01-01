@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 import org.gj.java.utility.filehandling.ContenttLoader;
@@ -14,7 +15,7 @@ import org.gj.java.utility.restfulservices.restfulclient.model.GetRequest;
 import org.gj.java.utility.restfulservices.restfulclient.model.Person;
 import org.gj.java.utility.restfulservices.restfulclient.model.PostRequest;
 import org.gj.java.utility.restfulservices.restfulclient.model.Request;
-
+import org.gj.java.utility.restfulservices.restfulclient.model.Response;
 import org.junit.AfterClass;
 
 import static org.junit.Assert.*;
@@ -55,31 +56,34 @@ public class RestClientManagerTest {
 	@Test
 	public void whenJsonGetRequestIsMadeToMockServerShouldReturnCorrectResponseObject() throws IOException, InterruptedException, ExecutionException{
 	  configureFor("localhost",8080);
-	  stubFor(get(urlEqualTo("/getTestPage")).willReturn(aResponse().withBody(ContenttLoader.readFile("person.txt").getBytes())));
+	  stubFor(get(urlEqualTo("/getTestPage")).willReturn(aResponse().withHeader("status", "200").withBody(ContenttLoader.readFile("person.txt").getBytes())));
 	  requestUrl="http://localhost:8080/getTestPage";
 	  headers.put(Constant.CONTENT_TYPE, Constant.MEDIATYPE_JSON);
 	  headers.put(Constant.ACCEPT, Constant.MEDIATYPE_JSON);
 	  responseClass=Person.class;
-	  requestBody=null;
-	  String httpMethod=Constant.GET_METHOD;
 	  Request request=new GetRequest(requestUrl,headers, responseClass);
-	  Person response=(Person)restClient.getData(request);
-	  assertEquals(response.getId(), 1);
+	  Response response=restClient.getData(request);
+	  Map<String,String> responseHeaders=response.getHeaders();
+	  Person person=(Person)response.getBody();
+	  assertEquals(person.getId(), 1);
+	  assertEquals(responseHeaders.get("status"), "200");
 	}
 	
 	@Test
 	public void whenXmlGetRequestIsMadeToMockServerShouldReturnCorrectResponseObject() throws IOException, InterruptedException, ExecutionException{
 	  configureFor("localhost",8080);
-	  stubFor(get(urlEqualTo("/getXmlTestPage")).willReturn(aResponse().withBody(ContenttLoader.readFile("Person.xml").getBytes())));
+	  stubFor(get(urlEqualTo("/getXmlTestPage")).willReturn(aResponse().withHeader("status", "200").withBody(ContenttLoader.readFile("Person.xml").getBytes())));
 	  requestUrl="http://localhost:8080/getXmlTestPage";
 	  headers.put(Constant.CONTENT_TYPE, Constant.MEDIATYPE_XML);
 	  headers.put(Constant.ACCEPT, Constant.MEDIATYPE_XML);
 	  responseClass=Person.class;
 	  requestBody=null;
-	  String httpMethod=Constant.GET_METHOD;
 	  Request request=new GetRequest(requestUrl, headers,responseClass);
-	  Person response=(Person)restClient.getData(request);
-	  assertEquals(response.getId(), 123);
+	  Response response=restClient.getData(request);
+	  Map<String,String> responseHeaders=response.getHeaders();
+	  Person person=(Person)response.getBody();
+	  assertEquals(person.getId(), 123);
+	  assertEquals(responseHeaders.get("status"), "200");
 	}
 	
 	@Test
@@ -91,22 +95,25 @@ public class RestClientManagerTest {
 	  configureFor("localhost",8080);
 	  stubFor(post(urlEqualTo("/gePostWithParticularBodytXmlTestPage"))
 			  .withRequestBody(equalToXml("<Person><name>dummyNameRqst</name><id>234</id><address>dummyAddressRqst</address></Person>"))
-			  .willReturn(aResponse().withBody(ContenttLoader.readFile("Person.xml").getBytes())));
+			  .willReturn(aResponse().withHeader("status", "200").withBody(ContenttLoader.readFile("Person.xml").getBytes())));
 	  requestUrl="http://localhost:8080/gePostWithParticularBodytXmlTestPage";
 	  headers.put(Constant.CONTENT_TYPE, Constant.MEDIATYPE_XML);
 	  headers.put(Constant.ACCEPT, Constant.MEDIATYPE_XML);
 	  responseClass=Person.class;
 	  requestBody=person;
 	  Request request=new PostRequest(requestUrl, headers, requestBody, responseClass);
-	  Person response=(Person)restClient.getData(request);
-	  assertEquals(response.getId(), 123);
+	  Response response=restClient.getData(request);
+	  Map<String,String> responseHeaders=response.getHeaders();
+	  Person responseBody=(Person)response.getBody();
+	  assertEquals(responseBody.getId(), 123);
+	  assertEquals(responseHeaders.get("status"), "200");
 	}
 
 			
 	@Test
 	public void whenJsonPostRequestIsMadeToMockServerShouldReturnCorrectResponseObject() throws IOException, InterruptedException, ExecutionException{
 	  configureFor("localhost",8080);
-	  stubFor(post(urlEqualTo("/getPostTestPage")).willReturn(aResponse().withBody(ContenttLoader.readFile("person.txt").getBytes())));
+	  stubFor(post(urlEqualTo("/getPostTestPage")).willReturn(aResponse().withHeader("status", "200").withBody(ContenttLoader.readFile("person.txt").getBytes())));
 	  requestUrl="http://localhost:8080/getPostTestPage";
 	  headers.put(Constant.CONTENT_TYPE, Constant.MEDIATYPE_JSON);
 	  headers.put(Constant.ACCEPT, Constant.MEDIATYPE_JSON);
@@ -114,8 +121,11 @@ public class RestClientManagerTest {
 	  requestBody=new Person();
 	  ((Person)requestBody).setName("postDummyName");
 	  Request request=new PostRequest(requestUrl, headers, requestBody, responseClass);
-	  Person response=(Person)restClient.getData(request);
-	  assertEquals(response.getId(), 1);
+	  Response response=restClient.getData(request);
+	  Map<String,String> responseHeaders=response.getHeaders();
+	  Person responseBody=(Person)response.getBody();
+	  assertEquals(responseBody.getId(), 1);
+	  assertEquals(responseHeaders.get("status"), "200");
 	}
 	
 	@Test
@@ -161,11 +171,11 @@ public class RestClientManagerTest {
 	  requests.add(request3);
 	  
 	  
-	  List<Object> responses=(List<Object>)restClient.getData(requests);
+	  List<Response> responses=(List<Response>)restClient.getData(requests);
 	  assertEquals(responses.size(), 3);
-	  assertEquals(((Person)responses.get(0)).getId(), 1);
-	  assertEquals(((Person)responses.get(1)).getId(), 2);
-	  assertEquals(((Person)responses.get(2)).getId(), 3);
+	  assertEquals(((Person)responses.get(0).getBody()).getId(), 1);
+	  assertEquals(((Person)responses.get(1).getBody()).getId(), 2);
+	  assertEquals(((Person)responses.get(2).getBody()).getId(), 3);
 	}
 	
 	

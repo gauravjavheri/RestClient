@@ -11,12 +11,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.gj.java.utility.restfulservices.restfulclient.common.Constant;
 import org.gj.java.utility.restfulservices.restfulclient.model.Request;
+import org.gj.java.utility.restfulservices.restfulclient.model.Response;
 import org.gj.java.utility.restfulservices.restfulclient.parser.Parser;
 
 public class HttpPostClient extends HttpClient{
 
 	@Override
-	public Object execute(Request request) throws Exception {
+	public Response execute(Request request) throws Exception {
+		Response response=new Response();
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpPost  httpPost = new HttpPost (request.getResource_uri());
 		Map<String,String>header=request.getHeaders();
@@ -32,6 +34,9 @@ public class HttpPostClient extends HttpClient{
 		}
 		CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
         Parser responseParser=getParser(request.getHeaders().get(Constant.ACCEPT));        
-		return responseParser.deserialize(getResponseBody(httpResponse), request.getResponseClass());
+        response.setHeaders(getResponseHeader(httpResponse));
+        response.setBody(responseParser.deserialize(getResponseBody(httpResponse), request.getResponseClass()));
+		return response;
+
 	}
 }

@@ -12,9 +12,12 @@ It is java library developed on top of Apache HTTP library and JDK executor fram
 
 1. Download executions
 2. Support for HTTP PUT,DELETE, OPTIONS methods.
+3. Request TimeOut
 
 
 ## How to use 
+
+Note : One can refer testcases for better understanding of usage of library.
 
 ### Add Library Jar to classpath
 
@@ -75,9 +78,13 @@ Likewise upon Accept header value, library build response object either from jso
 
 ### Make Request and Collect Response
 
+Below code will get Response object which has header and body part.
+
 ```java
 
-	Response response=(Response)restClient.getData(request);
+	Response response=restClient.getData(request);
+	Map<String,String> responseHeaders=response.getHeaders();
+	ResponseBody person=(ResponseBody)response.getBody();
 
 ```
 
@@ -115,6 +122,6 @@ Likewise upon Accept header value, library build response object either from jso
 	requests.add(request2);
 	requests.add(request3);
 	  
-	List<Object> responses=(List<Object>)restClient.getData(requests);
+	List<Response> responses=(List<Response>)restClient.getData(requests);
 	
 ```
